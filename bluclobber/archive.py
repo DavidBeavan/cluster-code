@@ -3,8 +3,6 @@ import re
 
 from book import Book
 
-from cStringIO import StringIO
-
 import logging
 
 class Archive(object):
@@ -12,8 +10,40 @@ class Archive(object):
         self.logger=logging.getLogger('performance')
         self.logger.info("Opening archive ")
 
+        are_urls = len(stream) > 0 and \
+            (stream.lower().startswith("http://") or \
+             stream.lower().startswith("https://"))
+
+        are_blobs = len(stream) > 0 and \
+            (stream.lower().startswith("blob:"))
+
+        if (are_urls):
+            import requests
+ 
+            from cStringIO import StringIO
+            mmap = StringIO(requests.get(stream, stream=True).raw.read())
+ 
+        elif (are_blobs):
+            from azure.storage.blob import BlobService
+            import os
+            import io
+
+            sas_token = os.environ['BLOB_SAS_TOKEN']
+            if (sas_token[0] == '?'):
+                 sas_token = sas_token[1:]
+
+            blob_service = BlobService(account_name = os.environ['BLOB_ACCOUNT_NAME'], sas_token = sas_token)
+            stream = stream[5:]
+            blob=blob_service.get_blob_to_bytes(os.environ['BLOB_CONTAINER_NAME'], stream)
+            mmap = io.BytesIO(blob)
+
+        else:
+            from cStringIO import StringIO
+
+            mmap=StringIO(open(stream).read())
+
         self.logger.debug("Opened archive")
-        mmap=StringIO(stream.read())
+ 
         self.logger.info("Slurped archive")
         self.zip = zipfile.ZipFile(mmap)
         self.logger.debug("Examining books in archive")

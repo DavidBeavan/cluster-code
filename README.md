@@ -23,6 +23,23 @@ For more info on the project see the [UCL DH](http://blogs.ucl.ac.uk/dh/2015/05/
 
 ---
 
+## Azure users, 1st draft notes
+Go with EPCC branch, standalone
+
+- conda install -c conda-forge azure 
+
+Then if you are using blobs set
+
+- export BLOB_ACCOUNT_NAME="clustercodetestdata"
+- export BLOB_SAS_TOKEN="?sv=2017-11-09&ss=b&srt=sco&sp=rl&se=2020-12-31T00:00:00Z&st=2018-11-01T00:00:00Z&spr=https&sig=FsZ0mSMXK8jj5gNewDxDKe6iT8xt7tqR5qf5y3%2B%2F9lM%3D"
+- export BLOB_CONTAINER_NAME="clustercodetestdata"
+
+NB the above is read-only sample data, as already referenced
+
+prefix blob with 'blob:' in oids.txt
+
+---
+
 ## UCL users
 
 ### Beware: epcc-sparkrods branch
