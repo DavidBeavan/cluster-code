@@ -18,8 +18,8 @@ class Archive(object):
         self.zip = zipfile.ZipFile(mmap)
         self.logger.debug("Examining books in archive")
         self.filenames = [entry.filename for entry in self.zip.infolist()]
-        book_pattern = re.compile('([0-9]*)_metadata\.xml')
-        page_pattern = re.compile('ALTO\/([0-9]*?)_([0-9_]*)\.xml')
+        book_pattern = re.compile('([0-9]*?_[0-9]*?)_mets\.xml')
+        page_pattern = page_pattern = re.compile('([0-9]*?_[0-9]*?)_([0-9_]*)\.xml')
         self.logger.debug("Enumerating books")
         bookmatches=filter(None, [ book_pattern.match(name) for name in self.filenames ])
         pagematches=filter(None, [ page_pattern.match(name) for name in self.filenames ])
@@ -30,16 +30,16 @@ class Archive(object):
 
 
     def zip_info_for_book(self, book_code):
-        return self.zip.getinfo(book_code + '_metadata.xml')
+        return self.zip.getinfo(book_code + '_mets.xml')
 
     def zip_info_for_page(self, book_code, page):
-        return self.zip.getinfo('ALTO/' + book_code + '_' + page + '.xml')
+        return self.zip.getinfo(book_code + '_' + page + '.xml')
 
     def metadata_file(self, book_code):
-        return self.zip.open(book_code + '_metadata.xml')
+        return self.zip.open(book_code + '_mets.xml')
 
     def page_file(self, book_code, page):
-        return self.zip.open('ALTO/' + book_code + '_' + page + '.xml')
+        return self.zip.open(book_code + '_' + page + '.xml')
 
     def __getitem__(self, index):
         self.logger.debug("Creating book")
